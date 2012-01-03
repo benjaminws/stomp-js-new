@@ -99,3 +99,42 @@ describe('When asking for a receipt', function() {
   });
 
 });
+
+describe('When asking for the frame as a string', function() {
+  var frame;
+  var receipt;
+  var frame_args;
+  var new_frame;
+
+  beforeEach(function() {
+    receipt = false;
+    frame_args = {
+      'body': 'test',
+      'headers': {'test': 'test'},
+      'command': 'test'
+    }
+    frame = new Frame();
+    new_frame = frame.build_frame(frame_args, receipt);
+  });
+
+  it('should return a string', function() {
+    expect(typeof(new_frame.as_string())).toBe('string');
+  });
+
+  it('should have the command, followed by a newline', function() {
+    expect(new_frame.as_string()).toMatch(/^test\n/);
+  });
+
+  it('should have one header, followed by two newlines', function() {
+    expect(new_frame.as_string()).toMatch(/^test\ntest:test\n\n/);
+  });
+
+  it('should have a body', function() {
+    expect(new_frame.as_string()).toMatch(/^test\ntest:test\n\ntest/);
+  });
+
+  it('should end with a null byte', function() {
+    expect(new_frame.as_string()).toMatch(/^test\ntest:test\n\ntest\0/);
+  });
+
+});
