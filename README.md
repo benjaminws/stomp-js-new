@@ -5,28 +5,4 @@ stomp-js
 
 An exercise with node.js to implement the STOMP protocol.
 
-For documentation see doc/stomp.md and doc/frame.md
-
-## Installation
-
-`npm install stomp`
-
-`git clone https://benjaminws@github.com/benjaminws/stomp-js.git`
-
-## Examples
-
-### Consumer
-
-See examples/stomp-consumer.js
-
-### Producer
-
-See examples/stomp-producer.js
-
-### Producer with Transaction Support
-
-See examples/stomp-producer-txn.js
-
-### Contributors
-
-rofflwaffls -at- gmail.com
+Doing what should have been done the first time, test driving it.
