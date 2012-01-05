@@ -11,8 +11,8 @@
     "type" : "git",
     "url" : "https://benjaminws@github.com/benjaminws/stomp-js-new.git"
   },
-  "dependencies" : {
-    "jasmine": "https://github.com/adomokos/jasmine-node/tarball/master"
+  "devDependencies": {
+    "jasmine-node": "1.0.13"
   },
   "directories" : {
     "doc": "./doc",
@@ -23,7 +23,7 @@
     "type" : "BSD",
     "url" : "https://github.com/benjaminws/stomp-js-new/raw/master/LICENSE"
   }],
-  scripts: {
-    test: "jasmine-node spec/"
-  },
+  "scripts": {
+    "test": "jasmine-node spec/"
+  }
 }
