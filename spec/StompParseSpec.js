@@ -51,6 +51,18 @@ describe('When parsing a frame', function() {
   });
 
   describe('It will need to parse and return a whole frame', function() {
-    
+    var stomp_parse;
+
+    beforeEach(function () {
+      stomp_parse = new StompParse();
+      var data_string = 'CONNECTED\nsession-id:test\n\n\0';
+      data = Buffer(data_string, encoding='utf8');
+    });
+
+    it('should get an object', function() {
+      var full_drame = stomp_parse.parse_frame(data);
+      expect(typeof(full_frame).toBe('object'));
+    });
+
   });
 });
