@@ -60,8 +60,8 @@ describe('When parsing a frame', function() {
     });
 
     it('should get an object', function() {
-      var full_drame = stomp_parse.parse_frame(data);
-      expect(typeof(full_frame).toBe('object'));
+      var full_frame = stomp_parse.parse_frame(data);
+      expect(typeof(full_frame)).toBe('object');
     });
 
   });
