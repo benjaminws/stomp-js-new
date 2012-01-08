@@ -1,5 +1,4 @@
 var StompParse = require('../lib/stomp_parse').StompParse;
-var util = require('util');
 
 describe('When parsing a frame', function() {
 
@@ -59,7 +58,7 @@ describe('When parsing a frame', function() {
       stomp_parse = new StompParse();
       body = 'test body';
       content_length = body.length;
-      var data_string = util.format('CONNECTED\nsession-id:test\ncontent-length:%d\n\n%s\0', content_length, body);
+      var data_string = 'CONNECTED\nsession-id:test\ncontent-length:' + content_length +'\n\n'+ body + '\0';
       data = Buffer(data_string, encoding='utf8');
     });
 
