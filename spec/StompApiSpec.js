@@ -100,23 +100,9 @@ describe('StompApi', function() {
       expect(stomp.constructor).toEqual(process.EventEmitter);
     });
 
-    it('will call _setupSocketListeners()', function() {
-      spyOn(stomp, '_setupSocketListeners');
-      spyOn(stomp.stompSocket, 'connect');
-      stomp.connect();
-      expect(stomp._setupSocketListeners).toHaveBeenCalled();
-    });
-
   });
 
   describe('When connecting', function() {
-
-    it('will call _setupSocketListeners()', function() {
-      spyOn(stomp, '_setupSocketListeners');
-      spyOn(stomp.stompSocket, 'connect');
-      stomp.connect();
-      expect(stomp._setupSocketListeners).toHaveBeenCalled();
-    });
 
     it('will call connect on the socket', function() {
       spyOn(stomp, '_setupSocketListeners');
