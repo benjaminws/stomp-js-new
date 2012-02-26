@@ -96,6 +96,33 @@ describe('StompApi', function() {
       expect(stomp['client-id']).toEqual('test');
     });
 
+    it('will be an event emitter', function() {
+      expect(stomp.constructor).toEqual(process.EventEmitter);
+    });
+
+    it('will call _setupSocketListeners()', function() {
+      spyOn(stomp, '_setupSocketListeners');
+      stomp.connect();
+      expect(stomp._setupSocketListeners).toHaveBeenCalled();
+    });
+
+  });
+
+  describe('When connecting', function() {
+
+    it('will call _setupSocketListeners()', function() {
+      spyOn(stomp, '_setupSocketListeners');
+      spyOn(stomp.socket, 'connect');
+      stomp.connect();
+      expect(stomp._setupSocketListeners).toHaveBeenCalled();
+    });
+    it('will call connect on the socket', function() {
+      spyOn(stomp, '_setupSocketListeners');
+      spyOn(stomp.socket, 'connect');
+      stomp.connect();
+      expect(stomp.socket.connect).toHaveBeenCalled();
+    });
+
   });
 
 });
