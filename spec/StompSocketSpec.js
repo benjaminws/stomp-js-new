@@ -36,7 +36,7 @@ describe('StompSocket', function() {
     it('will call connect on the socket, with host and port args', function() {
       spyOn(stompSocket.socket, 'connect');
       stompSocket.connect();
-      expect(stompSocket.socket.connect).toHaveBeenCalledWith(stompSocket.host, stompSocket.port);
+      expect(stompSocket.socket.connect).toHaveBeenCalledWith(stompSocket.port, stompSocket.host);
     });
 
     it('will call setupListeners', function() {
@@ -44,6 +44,12 @@ describe('StompSocket', function() {
       spyOn(stompSocket, '_setupListeners');
       stompSocket.connect();
       expect(stompSocket._setupListeners).toHaveBeenCalled();
+    });
+
+    it('can call socket.disconnect()', function() {
+      spyOn(stompSocket.socket, 'destroy');
+      stompSocket.disconnect();
+      expect(stompSocket.socket.destroy).toHaveBeenCalled();
     });
 
   });

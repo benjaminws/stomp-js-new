@@ -102,6 +102,7 @@ describe('StompApi', function() {
 
     it('will call _setupSocketListeners()', function() {
       spyOn(stomp, '_setupSocketListeners');
+      spyOn(stomp.stompSocket, 'connect');
       stomp.connect();
       expect(stomp._setupSocketListeners).toHaveBeenCalled();
     });
@@ -112,15 +113,25 @@ describe('StompApi', function() {
 
     it('will call _setupSocketListeners()', function() {
       spyOn(stomp, '_setupSocketListeners');
-      spyOn(stomp.socket, 'connect');
+      spyOn(stomp.stompSocket, 'connect');
       stomp.connect();
       expect(stomp._setupSocketListeners).toHaveBeenCalled();
     });
+
     it('will call connect on the socket', function() {
       spyOn(stomp, '_setupSocketListeners');
-      spyOn(stomp.socket, 'connect');
+      spyOn(stomp.stompSocket, 'connect');
       stomp.connect();
-      expect(stomp.socket.connect).toHaveBeenCalled();
+      expect(stomp.stompSocket.connect).toHaveBeenCalled();
+    });
+
+  });
+  describe('When disconnecting', function() {
+
+    it('will call disconnect on the socket', function() {
+      spyOn(stomp.stompSocket, 'disconnect');
+      stomp.disconnect();
+      expect(stomp.stompSocket.disconnect).toHaveBeenCalled();
     });
 
   });
