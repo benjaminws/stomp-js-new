@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 var sys = require('util');
-var stomp = require('stomp');
+var Stomp = require('stomp').Stomp;
 
 // Set debug to true for more verbose output.
 // login and passcode are optional (required by rabbitMQ)
@@ -13,15 +13,13 @@ var stomp_args = {
     passcode: 'guest',
 };
 
-var client = new stomp.Stomp(stomp_args);
+var client = new Stomp(stomp_args);
 
-// 'activemq.prefetchSize' is optional.
 // Specified number will 'fetch' that many messages
 // and dump it to the client.
 var headers = {
     destination: '/queue/test_stomp',
     ack: 'client',
-//    'activemq.prefetchSize': '10'
 };
 
 var messages = 0;

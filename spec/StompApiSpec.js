@@ -1,4 +1,5 @@
-var Stomp = require('../lib/stomp_api').Stomp;
+var Stomp = require('../lib/stomp').Stomp;
+var Frame = require('../lib/frame').Frame;
 
 describe('StompApi', function() {
   var stomp;
@@ -127,13 +128,13 @@ describe('StompApi', function() {
     });
   });
   describe('When calling stomp connect', function() {
-    it('will call send_frame()', function() {
-      spyOn(stomp, 'send_frame');
+    it('will call send_command("CONNECT")', function() {
+      spyOn(stomp, 'send_command');
       stomp.stomp_connect();
-      expect(stomp.send_frame).toHaveBeenCalled();
+      expect(stomp.send_command).toHaveBeenCalledWith('CONNECT');
     });
   });
-  describe('When handing a new connect frame', function() {
+  describe('When handling a new connect frame', function() {
     var connected_frame;
     beforeEach(function() {
       connected_frame = {
@@ -150,6 +151,147 @@ describe('StompApi', function() {
       spyOn(stomp, 'emit');
       stomp.handle_frame(connected_frame);
       expect(stomp.emit).toHaveBeenCalledWith('connected');
+    });
+  });
+  describe('When handling a new message frame', function() {
+    var message_frame;
+    beforeEach(function() {
+      message_frame = {
+        command: 'MESSAGE',
+        headers: {
+          receipt:'bah',
+          destination:'/queue/test',
+          'message-id':'Q_/queue/test@@session-Q3Rpkl3yJFRzZNwHNZFiVq@@1',
+          'content-length':9
+        },
+        body:'HELLO'
+      }
+    });
+    it('will emit a "message" event, with a message frame', function() {
+      spyOn(stomp, 'emit');
+      stomp.handle_frame(message_frame);
+      expect(stomp.emit).toHaveBeenCalledWith('message', message_frame);
+    });
+  });
+  describe('When handling a receipt frame', function() {
+    var receipt_frame;
+    beforeEach(function() {
+      receipt_frame = {
+        command: 'RECEIPT',
+        headers: {
+          'receipt-id':'bah',
+        }
+      }
+    });
+    it('will emit a "receipt" event, with the receipt-id', function() {
+      spyOn(stomp, 'emit');
+      stomp.handle_frame(receipt_frame);
+      expect(stomp.emit).toHaveBeenCalledWith('receipt', 'bah');
+    });
+  });
+  describe('When handling a new error frame', function() {
+    var error_frame;
+    beforeEach(function() {
+      error_frame = {
+        command: 'ERROR',
+        headers: {
+          message:'Bad CONNECT',
+          'content-type':'text/plain',
+          'content-length':23
+        },
+        body:'Authentication failure'
+      }
+    });
+    it('will emit an "error" event, with an error frame', function() {
+      spyOn(stomp, 'emit');
+      stomp.handle_frame(error_frame);
+      expect(stomp.emit).toHaveBeenCalledWith('error', error_frame);
+    });
+  });
+  describe('When using send_command', function() {
+    it('will request a built frame, and send it', function() {
+      var command = 'CONNECT';
+      var headers = {};
+      var body = null;
+      var args = {
+        command: command,
+        headers: headers,
+        body: body
+      };
+      spyOn(stomp, 'send_frame');
+      spyOn(stomp.frame_builder, 'build_frame');
+      stomp.send_command(command, headers, body, false);
+      expect(stomp.frame_builder.build_frame).toHaveBeenCalledWith(args, false);
+      expect(stomp.send_frame).toHaveBeenCalled();
+    });
+  });
+  describe('When subscribing to a destination', function() {
+    it('will send a subscribe command', function() {
+      var headers = {
+        destination: '/queue/test',
+        ack: 'client'
+      }
+      spyOn(stomp, 'send_command');
+      stomp.subscribe(headers);
+      headers['session'] = stomp.session;
+      expect(stomp.send_command).toHaveBeenCalledWith('SUBSCRIBE', headers);
+    });
+  });
+  describe('When unsubscribing from a destination', function() {
+    it('will send an unsubscribe command', function() {
+      var headers = {
+        destination: '/queue/test',
+      }
+      spyOn(stomp, 'send_command');
+      stomp.unsubscribe(headers);
+      headers['session'] = stomp.session;
+      expect(stomp.send_command).toHaveBeenCalledWith('UNSUBSCRIBE', headers)
+    });
+  });
+  describe('When acking a message', function() {
+    it('will send an ack command, with the message id', function() {
+      var headers = {
+        'message-id': 'Q_/queue/test@@session-wxdjhR0riWQOCFO0ztK1RA@@1'
+      }
+      spyOn(stomp, 'send_command');
+      stomp.ack(headers['message-id']);
+      expect(stomp.send_command).toHaveBeenCalledWith('ACK', headers)
+    });
+  });
+  describe('When beginning a transaction', function() {
+    it('will send a begin command with a transaction id, and return the transaction id', function() {
+      spyOn(stomp, 'send_command');
+      var transaction_id = stomp.begin();
+      expect(stomp.send_command).toHaveBeenCalledWith('BEGIN', {'transaction': transaction_id});
+    });
+  });
+  describe('When committing a transaction', function() {
+    it('will send a commit command with a transaction id', function() {
+      spyOn(stomp, 'send_command');
+      var transaction_id = Math.floor(Math.random()*99999999999).toString();
+      stomp.commit(transaction_id);
+      expect(stomp.send_command).toHaveBeenCalledWith('COMMIT', {'transaction': transaction_id});
+    });
+  });
+  describe('When aborting a transaction', function() {
+    it('will send an abort command with a transaction id', function() {
+      spyOn(stomp, 'send_command');
+      var transaction_id = Math.floor(Math.random()*99999999999).toString();
+      stomp.abort(transaction_id);
+      expect(stomp.send_command).toHaveBeenCalledWith('ABORT', {'transaction': transaction_id});
+    });
+  });
+  describe('When sending a message', function() {
+    it('will send a message command with a body and headers object', function() {
+      spyOn(stomp, 'send_command');
+      var body = 'test'
+      var headers = {
+        destination: '/queue/test',
+        persistent: true
+      }
+      stomp.send(body, headers);
+      headers['session'] = stomp.session;
+      expect(stomp.send_command).toHaveBeenCalledWith('SEND', headers, body, false);
     });
   });
 });

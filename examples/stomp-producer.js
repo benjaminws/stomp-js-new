@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-var stomp = require('stomp');
+var Stomp = require('stomp').Stomp;
 
 var num = process.argv[2];
 
@@ -18,7 +18,7 @@ var stomp_args = {
     passcode: 'guest',
 }
 
-var client = new stomp.Stomp(stomp_args);
+var client = new Stomp(stomp_args);
 
 var queue = '/queue/test_stomp';
 
@@ -27,14 +27,13 @@ client.connect();
 client.on('connected', function() {
     num = num || 1000;
     for (var i = 0; i < num; i++) {
-        client.send({
+        var body = 'Testing\n\ntesting1\n\ntesting2 ' + i;
+        client.send(body, {
             'destination': queue,
-            'body': 'Testing\n\ntesting1\n\ntesting2 ' + i,
             'persistent': 'true'
         }, receipt);
     }
     console.log('Produced ' + num + ' messages');
-    client.disconnect();
 });
 
 client.on('receipt', function(receipt) {
@@ -47,7 +46,6 @@ client.on('error', function(error_frame) {
 });
 
 process.on('SIGINT', function() {
-    console.log('Produced ' + num + ' messages');
     client.disconnect();
     process.exit(0);
 });
