@@ -281,6 +281,16 @@ describe('StompApi', function() {
       });
     });
 
+    describe('When nacking a message', function() {
+      it('will send an nack command, with the message id', function() {
+        var headers = {
+          'message-id': 'Q_/queue/test@@session-wxdjhR0riWQOCFO0ztK1RA@@1'
+        }
+        stomp.nack(headers['message-id']);
+        expect(stomp.send_command).toHaveBeenCalledWith('NACK', headers)
+      });
+    });
+
     describe('When beginning a transaction', function() {
       it('will send a begin command with a transaction id, and return the transaction id', function() {
         var transaction_id = stomp.begin();
